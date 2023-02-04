@@ -8,7 +8,7 @@ public class EnvVars {
     //Fuck .envs, I make my OWN scuffed env vars thingy!!!
     //Directory name
     private static final String DIR_NAME = "plugins/GMPlugins_res";
-
+    //Fuck .envs, I make my OWN scuffed env vars thingy!!!
     //DB URL and DB directory path
     public static final String DB_URL = "jdbc:sqlite:" + new File("").getAbsolutePath() + "/"+DIR_NAME+"/gd_db.db";
     public static final Path DB_DIR_PATH = Paths.get(new File("").getAbsolutePath() + "/"+DIR_NAME);
