@@ -5,6 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class EnvVars {
+    //Fuck .envs, I make my OWN scuffed env vars thingy!!!
     //Directory name
     private static final String DIR_NAME = "plugins/GMPlugins_res";
 
