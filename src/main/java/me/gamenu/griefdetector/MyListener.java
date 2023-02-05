@@ -126,8 +126,8 @@ public class MyListener implements Listener {
             String key = "(" + coords.getBlockX() + "," + coords.getBlockY() + "," + coords.getBlockZ() + ")";
 
             //Add statement to cache, if cache is full dump to database
-            blockCache.put(block, new Object[] {key, bwuId});
-            if (blockCache.size() > 64){
+            blockCache.put(block, new Object[]{key, bwuId});
+            if (blockCache.size() > 64) {
                 dumpBlockCache(conn);
             }
 
@@ -144,8 +144,7 @@ public class MyListener implements Listener {
         PreparedStatement updateBlock = conn.prepareStatement("UPDATE gd_store SET bwu_id = ? WHERE coords = ?;");
         PreparedStatement queryDB;
         ResultSet rs;
-        for (Object[] data :
-                blockCache.values()) {
+        for (Object[] data : blockCache.values()) {
             queryDB = conn.prepareStatement("SELECT * FROM gd_store WHERE coords = ?;");
             queryDB.setString(1, (String) data[0]);
             rs = queryDB.executeQuery();
@@ -165,7 +164,8 @@ public class MyListener implements Listener {
         try {
             newBlock.executeBatch();
             updateBlock.executeBatch();
-        } catch (SQLException ignored) {}
+        } catch (SQLException ignored) {
+        }
         //i g n o r e d
         //I'm tired
         //Please send help
@@ -177,6 +177,7 @@ public class MyListener implements Listener {
         //Bye-bye cache!!!
 
     }
+
     @EventHandler
     public void onPlayerPlaceBlock(BlockPlaceEvent event) {
         updateDBWithBlock(event, event.getPlayer(), event.getBlock());
