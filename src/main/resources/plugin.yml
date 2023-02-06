@@ -3,4 +3,7 @@ version: '${project.version}'
 main: me.gamenu.griefdetector.GriefDetector
 api-version: 1.19
 authors: [ GaMeNu ]
-description: Grief Detector v2 ported to a Paper plugin
+description: Grief Detector v2 ported to a Paper
+commands:
+  gd:
+    description: Gives the player a GriefDetector item

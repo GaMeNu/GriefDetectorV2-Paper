@@ -15,4 +15,6 @@ public class EnvVars {
 
     //Column names in DB
     public static final String ID_COLUMN = "bwu_id";
+
+
 }

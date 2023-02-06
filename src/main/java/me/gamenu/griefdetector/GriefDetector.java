@@ -6,8 +6,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+import me.gamenu.griefdetector.commands.GdCommand;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.java.JavaPlugin;
-
 
 
 public final class GriefDetector extends JavaPlugin {
@@ -22,7 +23,16 @@ public final class GriefDetector extends JavaPlugin {
         final Logger log = getLogger();
         log.info("GDv2 is now online!");
         String url = EnvVars.DB_URL;
+        MyListener.initQueries();
+        getServer().getScheduler().scheduleSyncRepeatingTask(this, MyListener::decrementQueries, 0L, 10L);
 
+        //Register gd command
+        PluginCommand cmd = getCommand("gd");
+        if (cmd == null){
+            log.log(Level.WARNING, "An error has occurred while trying to load \"gd\" command: command returned null value");
+        } else {
+            cmd.setExecutor(new GdCommand());
+        }
 
 
 
@@ -63,9 +73,9 @@ public final class GriefDetector extends JavaPlugin {
 
 
         }
-        if (conn == null) {
+        //This quits the plugin, JetBrains you idiots
+        if (conn == null)
             Utils.quit(this, "");
-        }
 
         try {
             statement = conn.createStatement();
