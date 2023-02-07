@@ -11,7 +11,8 @@ This repository is a port of GriefDetector v2 (GDv2) first made in BWUBot v2.
 
 ## How to use
 ### Install on a server:
-- Download the latest production-ready .JAR file from Releases (to the right of the repo's homepage)
+- Download the latest production-ready .JAR file from Releases (see image)
+![Releases page, to the right of the repo's homepage](https://user-images.githubusercontent.com/98153342/217238119-b9377cce-3c01-4378-a5ff-ee0d5f0ffa3f.png)
 - Place the .JAR file within your server's plugin folder.
 - Start/restart your server
 - It's as simple as that! GDv2 will take care of the rest of the setup.
