@@ -1,6 +1,8 @@
 # GriefDetector V2 - PaperMC
 **WARNING: This plugin is still in early development, use at your own risk!**
 
+**Note: this plugin was made using PaperMC. While it may work for Bukkit or Spigot servers, it is best reccomended to use Paper to avoid bugs and malfunctions.**
+
 This repository is a port of GriefDetector v2 (GDv2) first made in BWUBot v2.
 
 ### Features:
