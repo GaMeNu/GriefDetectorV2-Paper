@@ -5,6 +5,8 @@
 
 This repository is a port of GriefDetector v2 (GDv2) first made in BWUBot v2.
 
+Feel free to point out/ridicule me for my terrible code! I would be grateful if you point out mistakes/places I can improve the code at
+
 ### Features:
 - Saves every placed/broken block using SQLite.
 - GriefDetector item to get the last player who modified the block.
