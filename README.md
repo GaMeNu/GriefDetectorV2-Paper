@@ -8,8 +8,17 @@ This repository is a port of GriefDetector v2 (GDv2) first made in BWUBot v2.
 Feel free to point out/ridicule me for my terrible code! I would be grateful if you point out mistakes/places I can improve the code at
 
 ### Features:
-- Saves every placed/broken block using SQLite.
+- Saves every placed/broken block using SQLite along with their dates.
 - GriefDetector item to get the last player who modified the block.
+- Old records are deleted after 14 days
+
+## Future plans:
+### Features:
+- Recording explosion damage
+- If data about a block is not found, the database will return the closest block in a 10x10x10 block radius
+- Adding a customization file with more customization options (top query limit, old record deletion time, etc...).
+### Bug fixes:
+- GD item doesn't require a stack size of 1 to work
 
 ## How to use
 ### Install on a server:
