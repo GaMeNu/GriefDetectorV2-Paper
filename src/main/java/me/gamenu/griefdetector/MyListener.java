@@ -142,7 +142,7 @@ public class MyListener implements Listener {
 
     }
 
-    private void dumpBlockCache(Connection conn) throws SQLException {
+    public void dumpBlockCache(Connection conn) throws SQLException {
         PreparedStatement newBlock = conn.prepareStatement("INSERT INTO gd_store (coords, bwu_id, date_modified) VALUES (?,?,date('now'));");
         PreparedStatement updateBlock = conn.prepareStatement("UPDATE gd_store SET bwu_id = ?, date_modified = date('now') WHERE coords = ?;");
         PreparedStatement queryDB;

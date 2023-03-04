@@ -19,12 +19,13 @@ import org.json.simple.parser.ParseException;
 
 public final class GriefDetector extends JavaPlugin {
 
+    MyListener listener;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
-
-        getServer().getPluginManager().registerEvents(new MyListener(), this);
+        listener = new MyListener();
+        getServer().getPluginManager().registerEvents(listener, this);
 
         final Logger log = getLogger();
         log.info("GDv2 is now online!");
@@ -170,5 +171,10 @@ public final class GriefDetector extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        try(Connection conn = DriverManager.getConnection(EnvVars.DB_URL)) {
+            listener.dumpBlockCache(conn);
+        } catch (SQLException e) {
+            Utils.quit(this, "Failed to dump block cache at shutdown:\n" + e);
+        }
     }
 }
