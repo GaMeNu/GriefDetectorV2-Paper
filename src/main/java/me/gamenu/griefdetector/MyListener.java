@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
@@ -33,7 +34,6 @@ public class MyListener implements Listener {
     private static final int QUERY_LIMIT = 16;
     private static final int TOP_QUERY_LIMIT = 32;
     private static int queries;
-
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
@@ -143,8 +143,8 @@ public class MyListener implements Listener {
     }
 
     private void dumpBlockCache(Connection conn) throws SQLException {
-        PreparedStatement newBlock = conn.prepareStatement("INSERT INTO gd_store (coords, " + EnvVars.ID_COLUMN + ") VALUES (?,?);");
-        PreparedStatement updateBlock = conn.prepareStatement("UPDATE gd_store SET bwu_id = ? WHERE coords = ?;");
+        PreparedStatement newBlock = conn.prepareStatement("INSERT INTO gd_store (coords, bwu_id, date_modified) VALUES (?,?,date('now'));");
+        PreparedStatement updateBlock = conn.prepareStatement("UPDATE gd_store SET bwu_id = ?, date_modified = date('now') WHERE coords = ?;");
         PreparedStatement queryDB;
         ResultSet rs;
         for (Object[] data : blockCache.values()) {
@@ -174,7 +174,7 @@ public class MyListener implements Listener {
         //Please send help
         //GM is forcing me to write code for him,
         //I need to pretend like I'm documenting my code
-        //Oh god I hear him coming ohfuckfuckfuck
+        //Oh god I hear him coming ohfuckfuckfu
 
         blockCache.clear();
         //Bye-bye cache!!!
@@ -186,16 +186,14 @@ public class MyListener implements Listener {
     }
 
     public static void decrementQueries() {
-        if (MyListener.queries > 0)
-            MyListener.queries--;
+        if (MyListener.queries > 0) MyListener.queries--;
     }
 
     private void useGD(BlockEvent event, Player player) {
 
-        if (queries < TOP_QUERY_LIMIT)
-            queries++;
+        if (queries < TOP_QUERY_LIMIT) queries++;
         else
-            player.getServer().getLogger().log(Level.WARNING, "Warning: Top Query limit ("+TOP_QUERY_LIMIT+") reached by "+player.getName());
+            player.getServer().getLogger().log(Level.WARNING, "Warning: Top Query limit (" + TOP_QUERY_LIMIT + ") reached by " + player.getName());
 
         if (queries >= QUERY_LIMIT) {
             player.sendMessage(Utils.getTag().append(Component.text("Error: Query limit reached! please try again in " + (queries / 2.0) + " seconds.").color(TextColor.color(255, 0, 0))));
@@ -207,13 +205,20 @@ public class MyListener implements Listener {
         String key = "(" + blockX + "," + blockY + "," + blockZ + ")";
 
         int bwuId;
+        String dateStr;
 
         Object[] cacheData = blockCache.get(event.getBlock());
+
+        //Check whether the block has been modified recently in the cache
+        //Else queries the main DB
         if (cacheData != null) {
             bwuId = (Integer) cacheData[1];
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date now = new java.util.Date();
+            dateStr = format.format(now);
         } else {
             try (Connection conn = DriverManager.getConnection(EnvVars.DB_URL)) {
-                PreparedStatement getBlock = conn.prepareStatement("SELECT " + EnvVars.ID_COLUMN + " FROM gd_store WHERE coords = ?;");
+                PreparedStatement getBlock = conn.prepareStatement("SELECT bwu_id, date_modified FROM gd_store WHERE coords = ?;");
                 getBlock.setString(1, key);
                 ResultSet rs = getBlock.executeQuery();
 
@@ -221,7 +226,8 @@ public class MyListener implements Listener {
                     player.sendMessage(Utils.getTag().append(Component.text("There seems to be no player assigned to location ").color(Utils.THEME)).append(Component.text(key).color(Utils.COMPLEMENT)));
                     return;
                 } else {
-                    bwuId = rs.getInt(EnvVars.ID_COLUMN);
+                    bwuId = rs.getInt("bwu_id");
+                    dateStr = rs.getString("date_modified");
                 }
 
             } catch (SQLException e) {
@@ -232,7 +238,7 @@ public class MyListener implements Listener {
         }
 
         try (Connection conn = DriverManager.getConnection(EnvVars.DB_URL)) {
-            PreparedStatement getUserData = conn.prepareStatement("SELECT username, uuid FROM players WHERE "+EnvVars.ID_COLUMN+" = ?;");
+            PreparedStatement getUserData = conn.prepareStatement("SELECT username, uuid FROM players WHERE " + EnvVars.ID_COLUMN + " = ?;");
             getUserData.setInt(1, bwuId);
             ResultSet rs = getUserData.executeQuery();
 
@@ -242,9 +248,10 @@ public class MyListener implements Listener {
                 String playerUsername = rs.getString("username");
                 String playerUUID = rs.getString("uuid");
 
-                player.sendMessage(Utils.getTag().append(Component.text("The last player who modified block ").color(Utils.THEME)).append(Component.text(key).color(Utils.ANALOG)).append(Component.text(" is:").color(Utils.THEME)));
+                player.sendMessage(Utils.getTag().append(Component.text("Here's the data found about block ").color(Utils.THEME)).append(Component.text(key).color(Utils.ANALOG)).append(Component.text(":").color(Utils.THEME)));
                 player.sendMessage(Utils.getBlankTag().append(Component.text("-| ").color(Utils.ANALOG)).append(Component.text("Username: ").color(Utils.THEME)).append(Component.text(playerUsername).color(Utils.COMPLEMENT)));
                 player.sendMessage(Utils.getBlankTag().append(Component.text("-| ").color(Utils.ANALOG)).append(Component.text("UUID: ").color(Utils.THEME)).append(Component.text(playerUUID).color(Utils.COMPLEMENT)));
+                player.sendMessage(Utils.getBlankTag().append(Component.text("-| ").color(Utils.ANALOG)).append(Component.text("Modification date: ").color(Utils.THEME)).append(Component.text(dateStr).color(Utils.COMPLEMENT)));
             }
 
         } catch (SQLException e) {
@@ -257,12 +264,10 @@ public class MyListener implements Listener {
 
     @EventHandler
     public void onPlayerPlaceBlock(BlockPlaceEvent event) {
-        if (event.getItemInHand().equals(Utils.getGDItem())){
+        if (event.getItemInHand().equals(Utils.getGDItem())) {
             useGD(event, event.getPlayer());
             event.setCancelled(true);
-        }
-        else
-            updateDBWithBlock(event, event.getPlayer());
+        } else updateDBWithBlock(event, event.getPlayer());
     }
 
     @EventHandler
@@ -270,8 +275,6 @@ public class MyListener implements Listener {
         if (event.getPlayer().getInventory().getItemInMainHand().equals(Utils.getGDItem())) {
             useGD(event, event.getPlayer());
             event.setCancelled(true);
-        }
-        else
-            updateDBWithBlock(event, event.getPlayer());
+        } else updateDBWithBlock(event, event.getPlayer());
     }
 }

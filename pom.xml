@@ -6,7 +6,7 @@
 
     <groupId>me.gamenu</groupId>
     <artifactId>griefdetector</artifactId>
-    <version>2.0.0-0.2.0b TR</version>
+    <version>2.0.0-0.3.0a PR</version>
     <packaging>jar</packaging>
 
     <name>GriefDetectorV2</name>
